@@ -1,0 +1,581 @@
+<mat-horizontal-stepper [linear]="isLinear" #stepper="matHorizontalStepper">
+    <mat-step [stepControl]="firstFormGroup">
+      <div class="container">
+        <form [formGroup]="firstFormGroup">
+          <div class="form">
+            <div class="field">
+              <mat-form-field hideRequiredMarker="true">
+                <input matInput formControlName="name" required autocomplete="off">
+                <mat-placeholder [ngStyle]="{'color': (firstFormGroup.get('name')?.errors !== null  || firstFormGroup.value.name === '') ? 'red' : 'black'}">Nom *</mat-placeholder>
+              </mat-form-field>
+            </div>
+            
+            <div class="field">
+              <mat-form-field hideRequiredMarker="true">
+                <mat-placeholder [ngStyle]="{'color': (firstFormGroup.get('place')?.errors !== null  || firstFormGroup.value.place === '') ? 'red' : 'black'}">Type de lieu *</mat-placeholder>
+                <mat-select formControlName="place">
+                  <mat-option *ngFor="let option of options" [value]="option">
+                    {{option}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            
+  
+            <div class="field">
+              <mat-form-field hideRequiredMarker="true">
+                <input matInput formControlName="address" autocomplete="off">
+                <mat-placeholder [ngStyle]="{'color': (firstFormGroup.get('address')?.errors !== null  || firstFormGroup.value.address === '') ? 'red' : 'black'}">Adresse *</mat-placeholder>
+              </mat-form-field>
+            </div>
+            
+            <div class="field">
+              <mat-form-field hideRequiredMarker="true">
+                <input matInput formControlName="arrondissement" autocomplete="off">
+                <mat-placeholder [ngStyle]="{'color': (firstFormGroup.get('arrondissement')?.errors !== null  || firstFormGroup.value.arrondissement === '') ? 'red' : 'black'}">Arrondissement *</mat-placeholder>
+              </mat-form-field>
+            </div>
+            
+  
+            <div class="field">
+              <mat-form-field hideRequiredMarker="true">
+                <input matInput formControlName="note" autocomplete="off">
+                <mat-placeholder [ngStyle]="{'color': (firstFormGroup.get('note')?.errors !== null  || firstFormGroup.value.note === '') ? 'red' : 'black'}">Note *</mat-placeholder>
+              </mat-form-field>
+            </div>
+            
+  
+            <div class="field">
+              <mat-form-field hideRequiredMarker="true">
+                <input matInput formControlName="price" autocomplete="off">
+                <mat-placeholder [ngStyle]="{'color': (firstFormGroup.get('price')?.errors !== null  || firstFormGroup.value.price === '') ? 'red' : 'black'}">Prix *</mat-placeholder>
+              </mat-form-field>
+            </div>
+            
+            <div class="field">
+              <mat-form-field *ngIf="firstFormGroup.value.place === 'Restaurant'" hideRequiredMarker="true">
+                <input matInput formControlName="type" autocomplete="off">
+                <mat-placeholder [ngStyle]="{'color': (firstFormGroup.get('type')?.errors !== null  || firstFormGroup.value.type === '') ? 'red' : 'black'}">Type *</mat-placeholder>
+              </mat-form-field>
+            </div>
+            
+  
+            <div class="field">
+              <mat-form-field *ngIf="firstFormGroup.value.place === 'Restaurant'" hideRequiredMarker="true">
+                <input matInput formControlName="theFork" autocomplete="off">
+                <mat-placeholder style="color: black;">Lien The Fork</mat-placeholder>
+              </mat-form-field>
+            </div>
+          </div>  
+        </form>
+
+        <div class="selectStation">
+          <div class="select">
+            <div class="searchBar">
+              <input matInput class="bar" [(ngModel)]="searchTerm" type="text" placeholder="Rechercher une station" [ngModelOptions]="{standalone: true}" autocomplete="off" />
+              <button (click)="filter(searchTerm)">
+                <mat-icon>search</mat-icon>
+              </button>
+            </div>
+
+            <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+              <div class="content" (click)="select(element)" *ngFor="let element of filteredData">
+                <p>{{element}}</p>
+              </div>
+            </div>
+            
+          </div>
+          
+
+          <div class="stations">
+            <p class="title">Stations sélectionnées</p>
+            <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+              <div class="content" (click)="select(element)" *ngFor="let element of selected">
+                <p>{{element}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-step>
+
+    <mat-step [stepControl]="secondFormGroup">
+      <div class="container">
+        <form [formGroup]="secondFormGroup">  
+          <div class="form">
+            <div class="field">
+              <div class="uploadWrapper">
+                <p>{{facadeName}}</p>
+                <input type="file" autocomplete="off" formControlName="img" (change)="facadeImage($event)">
+              </div>
+            </div>
+              
+            <div class="field">
+              <div class="uploadWrapper">
+                <p>{{platName}}</p>
+                <input type="file" autocomplete="off" formControlName="img" (change)="platImage($event)">
+              </div>
+            </div>
+    
+            <div class="radio">
+              <mat-label>Testé</mat-label>
+              <mat-radio-group (change)="test($event)" formControlName="tested" style="display: flex; justify-content: space-between; width: 100%;">
+                <mat-radio-button class="example-radio-button" *ngFor="let test of tested" [value]="test">
+                  {{test}}
+                </mat-radio-button>
+              </mat-radio-group>
+            </div>
+              
+    
+            <div class="field">
+              <mat-form-field hideRequiredMarker="true">
+                <input matInput formControlName="note_deco" autocomplete="off">
+                <mat-placeholder [ngStyle]="{'color': (secondFormGroup.get('note_deco')?.errors !== null  || secondFormGroup.value.note_deco === '') ? 'red' : 'black'}">Note Déco *</mat-placeholder>
+              </mat-form-field>
+            </div>
+              
+            <div class="field" *ngIf="!testedValue">
+              <mat-form-field hideRequiredMarker="true">
+                <input matInput formControlName="priority" autocomplete="off">
+                <mat-placeholder [ngStyle]="{'color': (secondFormGroup.get('priority')?.errors !== null  || secondFormGroup.value.priority === '') ? 'red' : 'black'}">Priorité *</mat-placeholder>
+              </mat-form-field>
+            </div>
+  
+            <div class="field">
+              <mat-form-field hideRequiredMarker="true">
+                <input matInput formControlName="ambiance" autocomplete="off">
+                <mat-placeholder [ngStyle]="{'color': (secondFormGroup.get('ambiance')?.errors !== null  || secondFormGroup.value.ambiance === '') ? 'red' : 'black'}">Ambiance *</mat-placeholder>
+              </mat-form-field>
+            </div>
+  
+            
+          </div>      
+          
+          <div class="field">
+            <mat-form-field style="width: 60% !important;" hideRequiredMarker="true">
+              <textarea matInput placeholder="Commentaire" formControlName="comment"></textarea>
+            </mat-form-field>
+          </div>
+        </form>
+      </div>
+      
+    </mat-step>
+
+    <mat-step [stepControl]="thirdFormGroup">
+      <form [formGroup]="thirdFormGroup">
+        
+        <mat-checkbox style="display: flex !important; align-items: center;" (change)="fillHoraires($event)">Remplir tous les horaires</mat-checkbox>
+
+        <div class="formHoraires">
+          <div class="horairesDay" (click)="changeDisplay('lundi')">
+            <div class="top">
+              <mat-label>Lundi</mat-label>
+              <button class="addHoraires" *ngIf="!displayHoraire.lundi">
+                <mat-icon>add</mat-icon>
+              </button>
+              <button class="addHoraires" *ngIf="displayHoraire.lundi">
+                <mat-icon>remove</mat-icon>
+              </button>
+            </div>
+            
+            <div class="line" *ngIf="!displayHoraire.lundi">
+              <mat-form-field appearance="outline">
+                <mat-label>Ouverture</mat-label>
+                <input type="time" matInput name="startMidLun" formControlName="startMidLun" autocomplete="off">
+              </mat-form-field>
+    
+              <mat-form-field appearance="outline">
+                <mat-label>Fermeture</mat-label>
+                <input type="time" matInput name="endMidLun" formControlName="endMidLun" autocomplete="off">
+              </mat-form-field>
+            </div>
+    
+            <div class="line" *ngIf="displayHoraire.lundi">
+              <mat-form-field appearance="outline">
+                <mat-label>Ouverture Midi</mat-label>
+                <input type="time" matInput name="startMidLun" formControlName="startMidLun" autocomplete="off">
+              </mat-form-field>
+    
+              <mat-form-field appearance="outline">
+                <mat-label>Fermeture Midi</mat-label>
+                <input type="time" matInput name="endMidLun" formControlName="endMidLun" autocomplete="off">
+              </mat-form-field>
+            </div>
+            <div class="line" *ngIf="displayHoraire.lundi">
+              <mat-form-field appearance="outline">
+                <mat-label>Ouverture Soir</mat-label>
+                <input type="time" matInput name="startSoirLun" formControlName="startSoirLun" autocomplete="off">
+              </mat-form-field>
+    
+              <mat-form-field appearance="outline">
+                <mat-label>Fermeture Soir</mat-label>
+                <input type="time" matInput name="endSoirLun" formControlName="endSoirLun" autocomplete="off">
+              </mat-form-field>
+            </div>
+          </div>
+  
+          <div class="horairesDay" (click)="changeDisplay('mardi')">
+            <div class="top">
+              <mat-label>Mardi</mat-label>
+              <button class="addHoraires" *ngIf="!displayHoraire.mardi">
+                <mat-icon>add</mat-icon>
+              </button>
+              <button class="addHoraires" *ngIf="displayHoraire.mardi">
+                <mat-icon>remove</mat-icon>
+              </button>
+            </div>
+        
+            <div class="line" *ngIf="!displayHoraire.mardi">
+              <mat-form-field appearance="outline">
+                <mat-label>Ouverture</mat-label>
+                <input type="time" matInput name="startMidMar" formControlName="startMidMar" autocomplete="off">
+              </mat-form-field>
+    
+              <mat-form-field appearance="outline">
+                <mat-label>Fermeture</mat-label>
+                <input type="time" matInput name="endMidMar" formControlName="endMidMar" autocomplete="off">
+              </mat-form-field>
+            </div>
+    
+            <div class="line" *ngIf="displayHoraire.mardi">
+              <mat-form-field appearance="outline">
+                <mat-label>Ouverture Midi</mat-label>
+                <input type="time" matInput name="startMidMar" formControlName="startMidMar" autocomplete="off">
+              </mat-form-field>
+    
+              <mat-form-field appearance="outline">
+                <mat-label>Fermeture Midi</mat-label>
+                <input type="time" matInput name="endMidMar" formControlName="endMidMar" autocomplete="off">
+              </mat-form-field>
+            </div>
+            <div class="line" *ngIf="displayHoraire.mardi">
+              <mat-form-field appearance="outline">
+                <mat-label>Ouverture Soir</mat-label>
+                <input type="time" matInput name="startSoirMar" formControlName="startSoirMar" autocomplete="off">
+              </mat-form-field>
+    
+              <mat-form-field appearance="outline">
+                <mat-label>Fermeture Soir</mat-label>
+                <input type="time" matInput name="endSoirMar" formControlName="endSoirMar" autocomplete="off">
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="horairesDay" (click)="changeDisplay('mercredi')">
+            <div class="top">
+              <mat-label>Mercredi</mat-label>
+              <button class="addHoraires" *ngIf="!displayHoraire.mercredi">
+                <mat-icon>add</mat-icon>
+              </button>
+              <button class="addHoraires" *ngIf="displayHoraire.mercredi">
+                <mat-icon>remove</mat-icon>
+              </button>
+            </div>
+    
+            <div class="line" *ngIf="!displayHoraire.mercredi">
+              <mat-form-field appearance="outline">
+                <mat-label>Ouverture</mat-label>
+                <input type="time" matInput name="startMidMer" formControlName="startMidMer" autocomplete="off">
+              </mat-form-field>
+    
+              <mat-form-field appearance="outline">
+                <mat-label>Fermeture</mat-label>
+                <input type="time" matInput name="endMidMer" formControlName="endMidMer" autocomplete="off">
+              </mat-form-field>
+            </div>
+    
+            <div class="line" *ngIf="displayHoraire.mercredi">
+              <mat-form-field appearance="outline">
+                <mat-label>Ouverture Midi</mat-label>
+                <input type="time" matInput name="startMidMer" formControlName="startMidMer" autocomplete="off">
+              </mat-form-field>
+    
+              <mat-form-field appearance="outline">
+                <mat-label>Fermeture Midi</mat-label>
+                <input type="time" matInput name="endMidMer" formControlName="endMidMer" autocomplete="off">
+              </mat-form-field>
+            </div>
+            <div class="line" *ngIf="displayHoraire.mercredi">
+              <mat-form-field appearance="outline">
+                <mat-label>Ouverture Soir</mat-label>
+                <input type="time" matInput name="startSoirMer" formControlName="startSoirMer" autocomplete="off">
+              </mat-form-field>
+    
+              <mat-form-field appearance="outline">
+                <mat-label>Fermeture Soir</mat-label>
+                <input type="time" matInput name="endSoirMer" formControlName="endSoirMer" autocomplete="off">
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="horairesDay" (click)="changeDisplay('jeudi')">
+            <div class="top">
+              <mat-label>Jeudi</mat-label>
+              <button class="addHoraires" *ngIf="!displayHoraire.jeudi">
+                <mat-icon>add</mat-icon>
+              </button>
+              <button class="addHoraires" *ngIf="displayHoraire.jeudi">
+                <mat-icon>remove</mat-icon>
+              </button>
+            </div>
+    
+            <div class="line" *ngIf="!displayHoraire.jeudi">
+              <mat-form-field appearance="outline">
+                <mat-label>Ouverture</mat-label>
+                <input type="time" matInput name="startMidJeu" formControlName="startMidJeu" autocomplete="off">
+              </mat-form-field>
+    
+              <mat-form-field appearance="outline">
+                <mat-label>Fermeture</mat-label>
+                <input type="time" matInput name="endMidJeu" formControlName="endMidJeu" autocomplete="off">
+              </mat-form-field>
+            </div>
+    
+            <div class="line" *ngIf="displayHoraire.jeudi">
+              <mat-form-field appearance="outline">
+                <mat-label>Ouverture Midi</mat-label>
+                <input type="time" matInput name="startMidJeu" formControlName="startMidJeu" autocomplete="off">
+              </mat-form-field>
+    
+              <mat-form-field appearance="outline">
+                <mat-label>Fermeture Midi</mat-label>
+                <input type="time" matInput name="endMidJeu" formControlName="endMidJeu" autocomplete="off">
+              </mat-form-field>
+            </div>
+    
+            <div class="line" *ngIf="displayHoraire.jeudi">
+              <mat-form-field appearance="outline">
+                <mat-label>Ouverture Soir</mat-label>
+                <input type="time" matInput name="startSoirJeu" formControlName="startSoirJeu" autocomplete="off">
+              </mat-form-field>
+    
+              <mat-form-field appearance="outline">
+                <mat-label>Fermeture Soir</mat-label>
+                <input type="time" matInput name="endSoirJeu" formControlName="endSoirJeu" autocomplete="off">
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="horairesDay" (click)="changeDisplay('vendredi')">
+            <div class="top">
+              <mat-label>Vendredi</mat-label>
+              <button class="addHoraires" *ngIf="!displayHoraire.vendredi">
+                <mat-icon>add</mat-icon>
+              </button>
+              <button class="addHoraires" *ngIf="displayHoraire.vendredi">
+                <mat-icon>remove</mat-icon>
+              </button>
+            </div>
+    
+            <div class="line" *ngIf="!displayHoraire.vendredi">
+              <mat-form-field appearance="outline">
+                <mat-label>Ouverture</mat-label>
+                <input type="time" matInput name="startMidVen" formControlName="startMidVen" autocomplete="off">
+              </mat-form-field>
+    
+              <mat-form-field appearance="outline">
+                <mat-label>Fermeture</mat-label>
+                <input type="time" matInput name="endMidVen" formControlName="endMidVen" autocomplete="off">
+              </mat-form-field>
+            </div>
+    
+            <div class="line" *ngIf="displayHoraire.vendredi">
+              <mat-form-field appearance="outline">
+                <mat-label>Ouverture Midi</mat-label>
+                <input type="time" matInput name="startMidVen" formControlName="startMidVen" autocomplete="off">
+              </mat-form-field>
+    
+              <mat-form-field appearance="outline">
+                <mat-label>Fermeture Midi</mat-label>
+                <input type="time" matInput name="endMidVen" formControlName="endMidVen" autocomplete="off">
+              </mat-form-field>
+            </div>
+            <div class="line" *ngIf="displayHoraire.vendredi">
+              <mat-form-field appearance="outline">
+                <mat-label>Ouverture Soir</mat-label>
+                <input type="time" matInput name="startSoirVen" formControlName="startSoirVen" autocomplete="off">
+              </mat-form-field>
+    
+              <mat-form-field appearance="outline">
+                <mat-label>Fermeture Soir</mat-label>
+                <input type="time" matInput name="endSoirVen" formControlName="endSoirVen" autocomplete="off">
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="horairesDay" (click)="changeDisplay('samedi')">
+            <div class="top">
+              <mat-label>Samedi</mat-label>
+              <button class="addHoraires" *ngIf="!displayHoraire.samedi">
+                <mat-icon>add</mat-icon>
+              </button>
+              <button class="addHoraires" *ngIf="displayHoraire.samedi">
+                <mat-icon>remove</mat-icon>
+              </button>
+            </div>
+    
+            <div class="line"  *ngIf="!displayHoraire.samedi">
+              <mat-form-field appearance="outline">
+                <mat-label>Ouverture</mat-label>
+                <input type="time" matInput name="startMidSam" formControlName="startMidSam" autocomplete="off">
+              </mat-form-field>
+    
+              <mat-form-field appearance="outline">
+                <mat-label>Fermeture</mat-label>
+                <input type="time" matInput name="endMidSam" formControlName="endMidSam" autocomplete="off">
+              </mat-form-field>
+            </div>
+    
+            <div class="line" *ngIf="displayHoraire.samedi">
+              <mat-form-field appearance="outline">
+                <mat-label>Ouverture Midi</mat-label>
+                <input type="time" matInput name="startMidSam" formControlName="startMidSam" autocomplete="off">
+              </mat-form-field>
+    
+              <mat-form-field appearance="outline">
+                <mat-label>Fermeture Midi</mat-label>
+                <input type="time" matInput name="endMidSam" formControlName="endMidSam" autocomplete="off">
+              </mat-form-field>
+            </div>
+            <div class="line" *ngIf="displayHoraire.samedi">
+              <mat-form-field appearance="outline">
+                <mat-label>Ouverture Soir</mat-label>
+                <input type="time" matInput name="startSoirSam" formControlName="startSoirSam" autocomplete="off">
+              </mat-form-field>
+    
+              <mat-form-field appearance="outline">
+                <mat-label>Fermeture Soir</mat-label>
+                <input type="time" matInput name="endSoirSam" formControlName="endSoirSam" autocomplete="off">
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="horairesDay" (click)="changeDisplay('dimanche')">
+            <div class="top">
+              <mat-label>Dimanche</mat-label>
+              <button class="addHoraires" *ngIf="!displayHoraire.dimanche">
+                <mat-icon>add</mat-icon>
+              </button>
+              <button class="addHoraires" *ngIf="displayHoraire.dimanche">
+                <mat-icon>remove</mat-icon>
+              </button>
+            </div>
+    
+            <div class="line" *ngIf="!displayHoraire.dimanche">
+              <mat-form-field appearance="outline">
+                <mat-label>Ouverture</mat-label>
+                <input type="time" matInput name="startMidDim" formControlName="startMidDim" autocomplete="off">
+              </mat-form-field>
+    
+              <mat-form-field appearance="outline">
+                <mat-label>Fermeture</mat-label>
+                <input type="time" matInput name="endMidDim" formControlName="endMidDim" autocomplete="off">
+              </mat-form-field>
+            </div>
+    
+            <div class="line" *ngIf="displayHoraire.dimanche">
+              <mat-form-field appearance="outline">
+                <mat-label>Ouverture Midi</mat-label>
+                <input type="time" matInput name="startMidDim" formControlName="startMidDim" autocomplete="off">
+              </mat-form-field>
+    
+              <mat-form-field appearance="outline">
+                <mat-label>Fermeture Midi</mat-label>
+                <input type="time" matInput name="endMidDim" formControlName="endMidDim" autocomplete="off">
+              </mat-form-field>
+            </div>
+            <div class="line" *ngIf="displayHoraire.dimanche">
+              <mat-form-field appearance="outline">
+                <mat-label>Ouverture Soir</mat-label>
+                <input type="time" matInput name="startSoirDim" formControlName="startSoirDim" autocomplete="off">
+              </mat-form-field>
+    
+              <mat-form-field appearance="outline">
+                <mat-label>Fermeture Soir</mat-label>
+                <input type="time" matInput name="endSoirDim" formControlName="endSoirDim" autocomplete="off">
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        
+        
+
+      </form>
+    </mat-step>
+
+    <mat-step [stepControl]="fourthFormGroup">
+      <form [formGroup]="fourthFormGroup">
+        <mat-label>Points positifs</mat-label>
+        <div class="line">
+          <mat-form-field>
+            <input matInput placeholder="Positif" formControlName="firstPositif" autocomplete="off">
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput placeholder="Positif" formControlName="secondPositif" autocomplete="off">
+          </mat-form-field>
+        </div>
+        <div class="line">
+          <mat-form-field>
+            <input matInput placeholder="Positif" formControlName="thirdPositif" autocomplete="off">
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput placeholder="Positif" formControlName="fourthPositif" autocomplete="off">
+          </mat-form-field>
+        </div>
+        <div class="line">
+          <mat-form-field>
+            <input matInput placeholder="Positif" formControlName="fifthPositif" autocomplete="off">
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput placeholder="Positif" formControlName="sixthPositif" autocomplete="off">
+          </mat-form-field>
+        </div>
+        <div class="line">
+          <mat-form-field>
+            <input matInput placeholder="Positif" formControlName="seventhPositif" autocomplete="off">
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput placeholder="Positif" formControlName="eighthPositif" autocomplete="off">
+          </mat-form-field>
+        </div>
+
+        <mat-label>Points négatifs</mat-label>
+        <div class="line">
+          <mat-form-field>
+            <input matInput placeholder="Négatif" formControlName="firstNegatif" autocomplete="off">
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput placeholder="Négatif" formControlName="secondNegatif" autocomplete="off">
+          </mat-form-field>
+        </div>
+        <div class="line">
+          <mat-form-field>
+            <input matInput placeholder="Négatif" formControlName="thirdNegatif" autocomplete="off">
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput placeholder="Négatif" formControlName="fourthNegatif" autocomplete="off">
+          </mat-form-field>
+        </div>
+        <div class="line">
+          <mat-form-field>
+            <input matInput placeholder="Négatif" formControlName="fifthNegatif" autocomplete="off">
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput placeholder="Négatif" formControlName="sixthNegatif" autocomplete="off">
+          </mat-form-field>
+        </div>
+        <div class="line">
+          <mat-form-field>
+            <input matInput placeholder="Négatif" formControlName="seventhNegatif" autocomplete="off">
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput placeholder="Négatif" formControlName="eighthNegatif" autocomplete="off">
+          </mat-form-field>
+        </div>
+  
+        <button type="submit" mat-button>Terminer</button>
+      </form>
+    </mat-step>
+
+  </mat-horizontal-stepper>
+  

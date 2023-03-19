@@ -1,0 +1,519 @@
+<mat-horizontal-stepper [linear]="isLinear" #stepper="matHorizontalStepper">
+  <mat-step [stepControl]="firstFormGroup">
+    <form [formGroup]="firstFormGroup">
+      <div class="line">
+        <mat-form-field>
+          <input matInput placeholder="Nom" formControlName="name" required>
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Adresse" formControlName="address" required>
+        </mat-form-field>
+      </div>
+      <div class="line">
+        <mat-form-field>
+            <input matInput placeholder="Arrondissement" formControlName="arrondissement" required>
+        </mat-form-field>
+      </div>
+      <div class="line">
+        <mat-form-field>
+          <mat-label>Nombre de station(s)</mat-label>
+          <mat-select [(ngModel)]="nbStation" (ngModelChange)="setStationValue()" [ngModelOptions]="{standalone: true}" required>
+            <mat-option *ngFor="let option of stationOptions" [value]="option">
+              {{option}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Station 1" [(ngModel)]="stations[0]" [ngModelOptions]="{standalone: true}" required>
+        </mat-form-field>
+      </div>
+      <div class="line" *ngIf="stations.length >= 2">
+        <mat-form-field *ngIf="stations.length >= 2">
+          <input matInput placeholder="Station 2" [(ngModel)]="stations[1]" [ngModelOptions]="{standalone: true}" required>
+        </mat-form-field>
+        <mat-form-field *ngIf="stations.length === 3">
+          <input matInput placeholder="Station 3" [(ngModel)]="stations[2]" [ngModelOptions]="{standalone: true}" required>
+        </mat-form-field>
+      </div>
+
+    </form>
+  </mat-step>
+
+  <mat-step [stepControl]="secondFormGroup">
+    <form [formGroup]="secondFormGroup">
+      <div class="line">
+        <mat-form-field>
+          <input matInput placeholder="Note" formControlName="note">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Prix" formControlName="price" required>
+        </mat-form-field>
+      </div>
+      <div class="line">
+        <div class="parent-div" style="display: flex; flex-direction: column; align-items: center; justify-content: space-around;">
+          <label>Façade</label>
+          <button class="btn-upload">{{facadeName}}</button>
+          <input style="width: 180px;" type="file" formControlName="img" (change)="facadeImage($event)">
+        </div>
+        <div class="parent-div" style="display: flex; flex-direction: column; align-items: center; justify-content: space-around;">
+          <label>Plat</label>
+          <button class="btn-upload">{{platName}}</button>
+          <input style="width: 180px;" type="file" formControlName="plat" (change)="platImage($event)">
+        </div>
+      </div>
+
+      <div class="line">
+        <mat-form-field>
+          <input matInput placeholder="Type" formControlName="type" required>
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Lien The Fork" formControlName="theFork">
+        </mat-form-field>
+      </div>
+
+      <div style="display: flex; flex-direction: column; width: 180px; margin-left: 6%;padding-bottom: 1.25em;margin-top: 2%">
+        <mat-label>Testé</mat-label>
+        <mat-radio-group (change)="test($event)" formControlName="tested" style="display: flex; justify-content: space-between;">
+          <mat-radio-button class="example-radio-button" *ngFor="let test of tested" [value]="test">
+            {{test}}
+          </mat-radio-button>
+        </mat-radio-group>
+      </div>
+
+      <div class="line" *ngIf="testedValue">
+        <mat-form-field>
+          <input matInput placeholder="Note Déco" formControlName="note_deco">
+        </mat-form-field>
+      </div>
+
+      <div class="line" *ngIf="!testedValue">
+        <mat-form-field>
+          <input matInput placeholder="Priorité" formControlName="priority">
+        </mat-form-field>
+      </div>
+
+    </form>
+  </mat-step>
+
+  <mat-step>
+    <form [formGroup]="thirdFormGroup">
+
+      <mat-form-field style="width: 100%;">
+        <textarea style="height: 150px;" matInput placeholder="Commentaire" formControlName="comment"></textarea>
+      </mat-form-field>
+
+      <mat-form-field>
+        <input matInput placeholder="Ambiance" formControlName="ambiance">
+      </mat-form-field>
+
+      <div style="display: flex; width: 50%; align-items: center; justify-content: space-between;" (click)="changeDisplay('lundi')">
+        <mat-label>Lundi</mat-label>
+        <button class="addHoraires" *ngIf="!displayHoraire.lundi">
+          <mat-icon>add</mat-icon>
+        </button>
+        <button class="addHoraires" *ngIf="displayHoraire.lundi">
+          <mat-icon>remove</mat-icon>
+        </button>
+      </div>
+
+      <div class="line" *ngIf="!displayHoraire.lundi">
+        <mat-form-field appearance="outline">
+          <mat-label>Ouverture</mat-label>
+          <input type="time" matInput name="startMidLun" formControlName="startMidLun">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fermeture</mat-label>
+          <input type="time" matInput name="endMidLun" formControlName="endMidLun">
+        </mat-form-field>
+      </div>
+
+      <div class="line" *ngIf="displayHoraire.lundi">
+        <mat-form-field appearance="outline">
+          <mat-label>Ouverture Midi</mat-label>
+          <input type="time" matInput name="startMidLun" formControlName="startMidLun" >
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fermeture Midi</mat-label>
+          <input type="time" matInput name="endMidLun" formControlName="endMidLun">
+        </mat-form-field>
+      </div>
+      <div class="line" *ngIf="displayHoraire.lundi">
+        <mat-form-field appearance="outline">
+          <mat-label>Ouverture Soir</mat-label>
+          <input type="time" matInput name="startSoirLun" formControlName="startSoirLun">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fermeture Soir</mat-label>
+          <input type="time" matInput name="endSoirLun" formControlName="endSoirLun">
+        </mat-form-field>
+      </div>
+
+    </form>
+  </mat-step>
+
+  <mat-step>
+    <form [formGroup]="fourthFormGroup">
+      <div style="display: flex; width: 50%; align-items: center; justify-content: space-between;" (click)="changeDisplay('mardi')">
+        <mat-label>Mardi</mat-label>
+        <button class="addHoraires" *ngIf="!displayHoraire.mardi">
+          <mat-icon>add</mat-icon>
+        </button>
+        <button class="addHoraires" *ngIf="displayHoraire.mardi">
+          <mat-icon>remove</mat-icon>
+        </button>
+      </div>
+
+      <div class="line" *ngIf="!displayHoraire.mardi">
+        <mat-form-field appearance="outline">
+          <mat-label>Ouverture</mat-label>
+          <input type="time" matInput name="startMidMar" formControlName="startMidMar" >
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fermeture</mat-label>
+          <input type="time" matInput name="endMidMar" formControlName="endMidMar">
+        </mat-form-field>
+      </div>
+
+      <div class="line" *ngIf="displayHoraire.mardi">
+        <mat-form-field appearance="outline">
+          <mat-label>Ouverture Midi</mat-label>
+          <input type="time" matInput name="startMidMar" formControlName="startMidMar" >
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fermeture Midi</mat-label>
+          <input type="time" matInput name="endMidMar" formControlName="endMidMar">
+        </mat-form-field>
+      </div>
+      <div class="line" *ngIf="displayHoraire.mardi">
+        <mat-form-field appearance="outline">
+          <mat-label>Ouverture Soir</mat-label>
+          <input type="time" matInput name="startSoirMar" formControlName="startSoirMar">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fermeture Soir</mat-label>
+          <input type="time" matInput name="endSoirMar" formControlName="endSoirMar">
+        </mat-form-field>
+      </div>
+
+      <div style="display: flex; width: 50%; align-items: center; justify-content: space-between;" (click)="changeDisplay('mercredi')">
+        <mat-label>Mercredi</mat-label>
+        <button class="addHoraires" *ngIf="!displayHoraire.mercredi">
+          <mat-icon>add</mat-icon>
+        </button>
+        <button class="addHoraires" *ngIf="displayHoraire.mercredi">
+          <mat-icon>remove</mat-icon>
+        </button>
+      </div>
+
+      <div class="line" *ngIf="!displayHoraire.mercredi">
+        <mat-form-field appearance="outline">
+          <mat-label>Ouverture</mat-label>
+          <input type="time" matInput name="startMidMer" formControlName="startMidMer" >
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fermeture</mat-label>
+          <input type="time" matInput name="endMidMer" formControlName="endMidMer">
+        </mat-form-field>
+      </div>
+
+      <div class="line" *ngIf="displayHoraire.mercredi">
+        <mat-form-field appearance="outline">
+          <mat-label>Ouverture Midi</mat-label>
+          <input type="time" matInput name="startMidMer" formControlName="startMidMer" >
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fermeture Midi</mat-label>
+          <input type="time" matInput name="endMidMer" formControlName="endMidMer">
+        </mat-form-field>
+      </div>
+      <div class="line" *ngIf="displayHoraire.mercredi">
+        <mat-form-field appearance="outline">
+          <mat-label>Ouverture Soir</mat-label>
+          <input type="time" matInput name="startSoirMer" formControlName="startSoirMer">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fermeture Soir</mat-label>
+          <input type="time" matInput name="endSoirMer" formControlName="endSoirMer">
+        </mat-form-field>
+      </div>
+
+    </form>
+  </mat-step>
+
+  <mat-step>
+    <form [formGroup]="fifthFormGroup">
+      <div style="display: flex; width: 50%; align-items: center; justify-content: space-between;" (click)="changeDisplay('jeudi')">
+        <mat-label>Jeudi</mat-label>
+        <button class="addHoraires" *ngIf="!displayHoraire.jeudi">
+          <mat-icon>add</mat-icon>
+        </button>
+        <button class="addHoraires" *ngIf="displayHoraire.jeudi">
+          <mat-icon>remove</mat-icon>
+        </button>
+      </div>
+
+      <div class="line" *ngIf="!displayHoraire.jeudi">
+        <mat-form-field appearance="outline">
+          <mat-label>Ouverture</mat-label>
+          <input type="time" matInput name="startMidJeu" formControlName="startMidJeu" >
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fermeture</mat-label>
+          <input type="time" matInput name="endMidJeu" formControlName="endMidJeu">
+        </mat-form-field>
+      </div>
+
+      <div class="line" *ngIf="displayHoraire.jeudi">
+        <mat-form-field appearance="outline">
+          <mat-label>Ouverture Midi</mat-label>
+          <input type="time" matInput name="startMidJeu" formControlName="startMidJeu" >
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fermeture Midi</mat-label>
+          <input type="time" matInput name="endMidJeu" formControlName="endMidJeu">
+        </mat-form-field>
+      </div>
+
+      <div class="line" *ngIf="displayHoraire.jeudi">
+        <mat-form-field appearance="outline">
+          <mat-label>Ouverture Soir</mat-label>
+          <input type="time" matInput name="startSoirJeu" formControlName="startSoirJeu">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fermeture Soir</mat-label>
+          <input type="time" matInput name="endSoirJeu" formControlName="endSoirJeu">
+        </mat-form-field>
+      </div>
+
+      <div style="display: flex; width: 50%; align-items: center; justify-content: space-between;" (click)="changeDisplay('vendredi')">
+        <mat-label>Vendredi</mat-label>
+        <button class="addHoraires" *ngIf="!displayHoraire.vendredi">
+          <mat-icon>add</mat-icon>
+        </button>
+        <button class="addHoraires" *ngIf="displayHoraire.vendredi">
+          <mat-icon>remove</mat-icon>
+        </button>
+      </div>
+
+      <div class="line" *ngIf="!displayHoraire.vendredi">
+        <mat-form-field appearance="outline">
+          <mat-label>Ouverture</mat-label>
+          <input type="time" matInput name="startMidVen" formControlName="startMidVen" >
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fermeture</mat-label>
+          <input type="time" matInput name="endMidVen" formControlName="endMidVen">
+        </mat-form-field>
+      </div>
+
+      <div class="line" *ngIf="displayHoraire.vendredi">
+        <mat-form-field appearance="outline">
+          <mat-label>Ouverture Midi</mat-label>
+          <input type="time" matInput name="startMidVen" formControlName="startMidVen" >
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fermeture Midi</mat-label>
+          <input type="time" matInput name="endMidVen" formControlName="endMidVen">
+        </mat-form-field>
+      </div>
+      <div class="line" *ngIf="displayHoraire.vendredi">
+        <mat-form-field appearance="outline">
+          <mat-label>Ouverture Soir</mat-label>
+          <input type="time" matInput name="startSoirVen" formControlName="startSoirVen">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fermeture Soir</mat-label>
+          <input type="time" matInput name="endSoirVen" formControlName="endSoirVen">
+        </mat-form-field>
+      </div>
+
+    </form>
+  </mat-step>
+
+  <mat-step>
+    <form [formGroup]="sixthFormGroup">
+      <div style="display: flex; width: 50%; align-items: center; justify-content: space-between;" (click)="changeDisplay('samedi')">
+        <mat-label>Samedi</mat-label>
+        <button class="addHoraires" *ngIf="!displayHoraire.samedi">
+          <mat-icon>add</mat-icon>
+        </button>
+        <button class="addHoraires" *ngIf="displayHoraire.samedi">
+          <mat-icon>remove</mat-icon>
+        </button>
+      </div>
+
+      <div class="line" *ngIf="!displayHoraire.samedi">
+        <mat-form-field appearance="outline">
+          <mat-label>Ouverture</mat-label>
+          <input type="time" matInput name="startMidSam" formControlName="startMidSam" >
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fermeture</mat-label>
+          <input type="time" matInput name="endMidSam" formControlName="endMidSam">
+        </mat-form-field>
+      </div>
+
+      <div class="line" *ngIf="displayHoraire.samedi">
+        <mat-form-field appearance="outline">
+          <mat-label>Ouverture Midi</mat-label>
+          <input type="time" matInput name="startMidSam" formControlName="startMidSam">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fermeture Midi</mat-label>
+          <input type="time" matInput name="endMidSam" formControlName="endMidSam">
+        </mat-form-field>
+      </div>
+      <div class="line" *ngIf="displayHoraire.samedi">
+        <mat-form-field appearance="outline">
+          <mat-label>Ouverture Soir</mat-label>
+          <input type="time" matInput name="startSoirSam" formControlName="startSoirSam">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fermeture Soir</mat-label>
+          <input type="time" matInput name="endSoirSam" formControlName="endSoirSam">
+        </mat-form-field>
+      </div>
+
+      <div style="display: flex; width: 50%; align-items: center; justify-content: space-between;" (click)="changeDisplay('dimanche')">
+        <mat-label>Dimanche</mat-label>
+        <button class="addHoraires" *ngIf="!displayHoraire.dimanche">
+          <mat-icon>add</mat-icon>
+        </button>
+        <button class="addHoraires" *ngIf="displayHoraire.dimanche">
+          <mat-icon>remove</mat-icon>
+        </button>
+      </div>
+
+      <div class="line" *ngIf="!displayHoraire.dimanche">
+        <mat-form-field appearance="outline">
+          <mat-label>Ouverture</mat-label>
+          <input type="time" matInput name="startMidDim" formControlName="startMidDim">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fermeture</mat-label>
+          <input type="time" matInput name="endMidDim" formControlName="endMidDim">
+        </mat-form-field>
+      </div>
+
+      <div class="line" *ngIf="displayHoraire.dimanche">
+        <mat-form-field appearance="outline">
+          <mat-label>Ouverture Midi</mat-label>
+          <input type="time" matInput name="startMidDim" formControlName="startMidDim">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fermeture Midi</mat-label>
+          <input type="time" matInput name="endMidDim" formControlName="endMidDim">
+        </mat-form-field>
+      </div>
+      <div class="line" *ngIf="displayHoraire.dimanche">
+        <mat-form-field appearance="outline">
+          <mat-label>Ouverture Soir</mat-label>
+          <input type="time" matInput name="startSoirDim" formControlName="startSoirDim">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fermeture Soir</mat-label>
+          <input type="time" matInput name="endSoirDim" formControlName="endSoirDim">
+        </mat-form-field>
+      </div>
+    </form>
+  </mat-step>
+
+  <mat-step [stepControl]="seventhFormGroup">
+    <form [formGroup]="seventhFormGroup">
+      <div class="line">
+        <mat-form-field>
+          <input matInput placeholder="Positif" formControlName="firstPositif">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Positif" formControlName="secondPositif">
+        </mat-form-field>
+      </div>
+      <div class="line">
+        <mat-form-field>
+          <input matInput placeholder="Positif" formControlName="thirdPositif">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Positif" formControlName="fourthPositif">
+        </mat-form-field>
+      </div>
+      <div class="line">
+        <mat-form-field>
+          <input matInput placeholder="Positif" formControlName="fifthPositif">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Positif" formControlName="sixthPositif">
+        </mat-form-field>
+      </div>
+      <div class="line">
+        <mat-form-field>
+          <input matInput placeholder="Positif" formControlName="seventhPositif">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Positif" formControlName="eighthPositif">
+        </mat-form-field>
+      </div>
+
+    </form>
+  </mat-step>
+
+  <mat-step [stepControl]="eighthFormGroup">
+    <form [formGroup]="eighthFormGroup" (ngSubmit)="edit()">
+      <div class="line">
+        <mat-form-field>
+          <input matInput placeholder="Négatif" formControlName="firstNegatif">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Négatif" formControlName="secondNegatif">
+        </mat-form-field>
+      </div>
+      <div class="line">
+        <mat-form-field>
+          <input matInput placeholder="Négatif" formControlName="thirdNegatif">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Négatif" formControlName="fourthNegatif">
+        </mat-form-field>
+      </div>
+      <div class="line">
+        <mat-form-field>
+          <input matInput placeholder="Négatif" formControlName="fifthNegatif">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Négatif" formControlName="sixthNegatif">
+        </mat-form-field>
+      </div>
+      <div class="line">
+        <mat-form-field>
+          <input matInput placeholder="Négatif" formControlName="seventhNegatif">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Négatif" formControlName="eighthNegatif">
+        </mat-form-field>
+      </div>
+
+      <button type="submit" mat-button>Terminer</button>
+    </form>
+  </mat-step>
+
+</mat-horizontal-stepper>

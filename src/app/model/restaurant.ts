@@ -1,0 +1,21 @@
+export interface Restaurant {
+    id: String,
+    name: String,
+    price: number,
+    note: number,
+    stations: String[],
+    type: String,
+    address: String,
+    arrondissement: number,
+    img: String,
+    comment: String,
+    plat: String,
+    theFork: String,
+    ambiance: String,
+    tested: boolean,
+    like: boolean,
+    positif: String[],
+    negatif: String[],
+    note_deco: number,
+    priority: number
+}

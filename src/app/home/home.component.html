@@ -1,0 +1,237 @@
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+<div class="background">
+    <div class="searchBar">
+        <form class="search">
+            <mat-form-field>
+                <mat-label style="color: white;">Rechercher un lieu</mat-label>
+                <input class="bar" matInput [(ngModel)]="searchTerm" type="text" autocomplete="off"/>
+                <mat-icon matSuffix style="color: white;" (click)="filter(searchTerm)">restaurant_menu</mat-icon>
+            </mat-form-field>
+        </form>
+    </div>
+    
+    <div [@openCloseDiv]="animationFilterDiv" class="resultDiv">
+        <div class="scrollButton" *ngIf="filteredData.length >= 2">
+            <button (click)="scrollLeft('results')" mat-button style="color: white; cursor: pointer; height: 50%; width: 100%;">
+                <mat-icon>keyboard_arrow_left</mat-icon>
+            </button>
+        </div>
+    
+        <div class="results" id="results" [ngStyle]="{'justify-content' : filteredData.length < 3 ? 'center' : 'flex-start'}" [@openCloseResult]="animationFilterResult" >
+            <mat-card class="card" *ngFor="let result of filteredData; index as i;" [routerLink]="['/showed',result.id]">
+                <mat-card-header style="height: 15%; width: 100%;">
+                    <img mat-card-avatar *ngIf="result.plat != null && result.plat.length > 0" [src]="result.plat"/>
+                    <img mat-card-avatar *ngIf="result.plat != null && result.plat.length === 0" [src]="'../../assets/' + result.typeIcon"/>    
+                    <img mat-card-avatar *ngIf="result.cocktails != null && result.cocktails[0].length > 0" [src]="result.cocktails[0]"/>
+                    <img mat-card-avatar *ngIf="result.cocktails != null && result.cocktails[0].length === 0" [src]="'../../assets/' + result.typeIcon"/>    
+                    <mat-card-title>{{result.name}}</mat-card-title>
+                    <circle-progress *ngIf="result.note.length > 0" class="note" [percent]="result.note * 10" [radius]="radius" [outerStrokeWidth]="strokeWidth" [innerStrokeWidth]="0"
+                        [outerStrokeColor]="'black'" [animation]="true" [animationDuration]="300" [titleFontSize]="titleFontSize" 
+                        [subtitleFontSize]="subtitleFontSize" [title]="result.note" [units]="''" [subtitle]="'/10'" [titleColor]="'black'"
+                        [subtitleColor]="'black'"></circle-progress>
+                    <circle-progress *ngIf="result.note.length === 0" class="note" [percent]="100" [radius]="radius" [outerStrokeWidth]="strokeWidth" [innerStrokeWidth]="0"
+                        [outerStrokeColor]="'red'" [animation]="true" [animationDuration]="300" [titleFontSize]="titleFontSize" 
+                        [subtitleFontSize]="subtitleFontSize" [title]="'-'" [units]="''" [subtitle]="'/10'" [titleColor]="'red'"
+                        [subtitleColor]="'black'"></circle-progress>
+                </mat-card-header>
+                <div class="info" [ngStyle]="{'background' : result.img.length > 0 ? 'linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('+ result.img +')' : 'linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('+ result.typeFacade +')'}">
+                    <div style="display: flex; justify-content: space-around; align-items: center; width: 100%; height: 100%;">
+                        <div class="lignes">
+                            <mat-nav-list>
+                                <mat-list-item *ngFor="let station of result.stations">
+                                    <span matLine>{{ station }}</span>
+                                    <div style="display: grid; grid-template-columns: auto auto auto;">
+                                        <ng-container *ngFor="let ligne of result.lignes | keyvalue">
+                                            <img mat-card-avatar style="margin: 1vh;" *ngIf="ligne.value === station" [src]="'../../assets/' + ligne.key + '.png'">
+                                        </ng-container>
+                                    </div>
+                                    
+                                </mat-list-item>
+                            </mat-nav-list>                    
+                        </div>
+                    </div>
+                </div>
+            </mat-card>
+        </div>
+    
+        <div *ngIf="filteredData.length >= 2" class="scrollButton">
+            <button (click)="scrollRight('results')" mat-button style="color: white; cursor: pointer; height: 50%; width: 100%;">
+                <mat-icon>keyboard_arrow_right</mat-icon>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="snowAnimation">
+    <div class="posDepart">
+        <img [ngStyle]="{'animation-delay' : i + 's', 'left' : randomPosition[i] + '%'}" mat-card-avatar *ngFor="let plat of allPlates;index as i;" [src]="plat">
+    </div>
+</div>
+<h1 id="title1" #title [@showTitle]="titlesAnimation[0]" class="title">Meilleures notes</h1>
+
+<!-- <div class="round">
+    <img [src]="allPlates[0]">
+</div>
+<div class="round">
+    <img [src]="allPlates[1]">
+</div>
+<div class="round">
+    <img [src]="allPlates[2]">
+</div>
+<div class="round">
+    <img [src]="allPlates[3]">
+</div> -->
+
+
+<div id="bestContainer">
+    <div id="best">
+        <div class="results">
+            <mat-card class="card" id="bestCard" *ngFor="let result of best; index as i;" [routerLink]="['/showed',result.id]">
+                <mat-card-header style="height: 15%; width: 100%;">
+                    <img mat-card-avatar *ngIf="result.plat.length > 0" [src]="result.plat"/>
+                    <img mat-card-avatar *ngIf="result.plat.length === 0" [src]="'../../assets/' + result.typeIcon"/>
+                    <mat-card-title>{{result.name}}</mat-card-title>
+                    <circle-progress *ngIf="result.note.length > 0" class="note" [percent]="result.note * 10" [radius]="radius" [outerStrokeWidth]="strokeWidth" [innerStrokeWidth]="0"
+                        [outerStrokeColor]="'black'" [animation]="true" [animationDuration]="300" [titleFontSize]="titleFontSize" 
+                        [subtitleFontSize]="subtitleFontSize" [title]="result.note" [units]="''" [subtitle]="'/10'" [titleColor]="'black'"
+                        [subtitleColor]="'black'"></circle-progress>
+                </mat-card-header>
+                <div class="info" [ngStyle]="{'background' : result.img.length > 0 ? 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('+ result.img +')' : 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('+ result.typeFacade +')'}">
+                    <div style="display: flex; justify-content: space-around; align-items: center; width: 100%; height: 100%;">
+                        <div class="lignes">
+                            <mat-nav-list>
+                                <mat-list-item *ngFor="let station of result.stations">
+                                    <span matLine>{{ station }}</span>
+                                    <div style="display: grid; grid-template-columns: auto auto auto;">
+                                        <ng-container *ngFor="let ligne of result.lignes | keyvalue">
+                                            <img mat-card-avatar style="margin: 1vh;" *ngIf="ligne.value === station" [src]="'../../assets/' + ligne.key + '.png'">
+                                        </ng-container>
+                                    </div>
+                                    
+                                </mat-list-item>
+                            </mat-nav-list>    
+                        </div>
+                    </div>
+                </div>
+            </mat-card>
+        </div>
+    </div>
+</div>
+
+
+<h1 id="title2" #title [@showTitle]="titlesAnimation[1]" class="title">Priorité absolue</h1>
+
+<div id="priorityContainer">
+    <div id="priority">
+
+        <div class="results">
+            <mat-card class="card" id="priorityCard" *ngFor="let result of priority; index as i;" [routerLink]="['/showed',result.id]">
+                <mat-card-header style="height: 15%; width: 100%;">
+                    <img mat-card-avatar *ngIf="result.plat.length > 0" [src]="result.plat"/>
+                    <img mat-card-avatar *ngIf="result.plat.length === 0" [src]="'../../assets/' + result.typeIcon"/>
+                    <mat-card-title>{{result.name}}</mat-card-title>
+                    <circle-progress class="note" [percent]="result.priority * 20" [radius]="radius" [outerStrokeWidth]="strokeWidth" [innerStrokeWidth]="0"
+                        [outerStrokeColor]="'black'" [animation]="true" [animationDuration]="300" [titleFontSize]="titleFontSize" 
+                        [subtitleFontSize]="subtitleFontSize" [title]="result.priority" [units]="''" [subtitle]="'/5'" [titleColor]="'black'"
+                        [subtitleColor]="'black'"></circle-progress>
+                </mat-card-header>
+                <div class="info" id="{{i}}" [ngStyle]="{'background' : result.img.length > 0 ? 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('+ result.img +')' : 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('+ result.typeFacade +')'}">
+                    <div style="display: flex; justify-content: space-around; align-items: center; width: 100%; height: 100%;">
+                        <div class="lignes">
+                            <mat-nav-list>
+                                <mat-list-item *ngFor="let station of result.stations">
+                                    <span matLine>{{ station }}</span>
+                                    <div style="display: grid; grid-template-columns: auto auto auto;">
+                                        <ng-container *ngFor="let ligne of result.lignes | keyvalue">
+                                            <img mat-card-avatar style="margin: 1vh;" *ngIf="ligne.value === station" [src]="'../../assets/' + ligne.key + '.png'">
+                                        </ng-container>
+                                    </div>
+                                    
+                                </mat-list-item>
+                            </mat-nav-list>                    
+                        </div>
+                    </div>
+                </div>
+            </mat-card>
+        </div>
+    
+    </div>
+</div>
+
+
+<div class="barsDiv">
+    <h1 id="title3" #title [@showTitle]="titlesAnimation[2]" class="title">Bars branchew</h1>
+    <div id="bestContainer">
+        <div id="best">
+            <div class="results">
+                <mat-card class="card"  id="bestCard" *ngFor="let result of bestBar; index as i;" [routerLink]="['/showed',result.id]">
+                    <mat-card-header style="height: 15%; width: 100%;">
+                        <img mat-card-avatar *ngIf="result.cocktails[0].length > 0" [src]="result.cocktails[0]"/>
+                        <img mat-card-avatar *ngIf="result.cocktails[0].length === 0" [src]="'../../assets/' + result.typeIcon"/>
+                        <mat-card-title>{{result.name}}</mat-card-title>
+                        <circle-progress *ngIf="result.note.length > 0" class="note" [percent]="result.note * 10" [radius]="radius" [outerStrokeWidth]="strokeWidth" [innerStrokeWidth]="0"
+                            [outerStrokeColor]="'black'" [animation]="true" [animationDuration]="300" [titleFontSize]="titleFontSize" 
+                            [subtitleFontSize]="subtitleFontSize" [title]="result.note" [units]="''" [subtitle]="'/10'" [titleColor]="'black'"
+                            [subtitleColor]="'black'"></circle-progress>
+                    </mat-card-header>
+                    <div class="info" [ngStyle]="{'background' : result.img.length > 0 ? 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('+ result.img +')' : 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('+ result.typeFacade +')'}">
+                        <div style="display: flex; justify-content: space-around; align-items: center; width: 100%; height: 100%;">
+                            <div class="lignes">
+                                <mat-nav-list>
+                                    <mat-list-item *ngFor="let station of result.stations">
+                                        <span matLine>{{ station }}</span>
+                                        <div style="display: grid; grid-template-columns: auto auto auto;">
+                                            <ng-container *ngFor="let ligne of result.lignes | keyvalue">
+                                                <img mat-card-avatar style="margin: 1vh;" *ngIf="ligne.value === station" [src]="'../../assets/' + ligne.key + '.png'">
+                                            </ng-container>
+                                        </div>
+                                        
+                                    </mat-list-item>
+                                </mat-nav-list>    
+                            </div>
+                        </div>
+                    </div>
+                </mat-card>
+            </div>
+        </div>
+    </div>
+    
+
+    <h1 id="title4" #title [@showTitle]="titlesAnimation[3]" class="title">Bars à voir</h1>
+    <div id="priorityContainer">
+        <div id="priority">
+            <div class="results">
+                <mat-card class="card"  id="priorityCard" *ngFor="let result of priorityBar; index as i;" [routerLink]="['/showed',result.id]">
+                    <mat-card-header style="height: 15%; width: 100%;">
+                        <img mat-card-avatar *ngIf="result.cocktails[0].length > 0" [src]="result.cocktails[0]"/>
+                        <img mat-card-avatar *ngIf="result.cocktails[0].length === 0" [src]="'../../assets/' + result.typeIcon"/>
+                        <mat-card-title>{{result.name}}</mat-card-title>
+                        <circle-progress class="note" [percent]="result.priority * 20" [radius]="radius" [outerStrokeWidth]="strokeWidth" [innerStrokeWidth]="0"
+                            [outerStrokeColor]="'black'" [animation]="true" [animationDuration]="300" [titleFontSize]="titleFontSize" 
+                            [subtitleFontSize]="subtitleFontSize" [title]="result.priority" [units]="''" [subtitle]="'/5'" [titleColor]="'black'"
+                            [subtitleColor]="'black'"></circle-progress>
+                    </mat-card-header>
+                    <div class="info" id="{{i}}" [ngStyle]="{'background' : result.img.length > 0 ? 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('+ result.img +')' : 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('+ result.typeFacade +')'}">
+                        <div style="display: flex; justify-content: space-around; align-items: center; width: 100%; height: 100%;">
+                            <div class="lignes">
+                                <mat-nav-list>
+                                    <mat-list-item *ngFor="let station of result.stations">
+                                        <span matLine>{{ station }}</span>
+                                        <div style="display: grid; grid-template-columns: auto auto auto;">
+                                            <ng-container *ngFor="let ligne of result.lignes | keyvalue">
+                                                <img mat-card-avatar style="margin: 1vh;" *ngIf="ligne.value === station" [src]="'../../assets/' + ligne.key + '.png'">
+                                            </ng-container>
+                                        </div>
+                                        
+                                    </mat-list-item>
+                                </mat-nav-list>                    
+                            </div>
+                        </div>
+                    </div>
+                </mat-card>
+            </div>
+        </div>
+    </div>
+    
+</div>

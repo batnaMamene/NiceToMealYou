@@ -1,0 +1,115 @@
+<div class="ads">
+    <h2 class="title">Bars sur Paris</h2>
+    <p>A la recherche d'un endroit où sortir ?</p>
+</div>
+
+<div class="sort">
+    <div id="sorter">
+        <mat-select [(ngModel)]="ambiancesSelect" (selectionChange)="sort()" placeholder="Type" #allAmbiance multiple class="select" required>
+            <mat-select-trigger>
+                Ambiance
+            </mat-select-trigger>
+            <mat-option *ngFor="let option of ambiances" [value]="option">
+                {{option}}
+            </mat-option>
+            <mat-option (click)="toggleAllAmbiance()" [value]="0">All</mat-option>
+        </mat-select>
+    </div>
+
+    <div id="sorter">
+        <mat-select (selectionChange)="sort()" placeholder="Ligne" #allLigne multiple class="select" required>
+            <mat-select-trigger>
+                Ligne
+            </mat-select-trigger>
+            <mat-option *ngFor="let option of lignes" [value]="option">
+                {{option}}
+            </mat-option>
+            <mat-option (click)="toggleAllLigne()" [value]="0">All</mat-option>
+        </mat-select>
+    </div>
+
+    <div id="sorter">
+        <mat-select (selectionChange)="sort()" placeholder="Arrondissement" #allArrondissement multiple class="select" required>
+            <mat-select-trigger>
+                Arrondissement
+            </mat-select-trigger>
+            <mat-option *ngFor="let option of arrondissements" [value]="option">
+                {{option}}
+            </mat-option>
+            <mat-option (click)="toggleAllArrondissement()" [value]="0">All</mat-option>
+        </mat-select>
+    </div>
+
+    <div id="sorter">
+        <mat-select (selectionChange)="sort()" #opened placeholder="Ouvert" multiple class="select" required>
+            <mat-option *ngFor="let option of openedOptions" [value]="option">
+                {{option}}
+            </mat-option>
+        </mat-select>
+    </div>
+
+    <div id="filter">
+        <button mat-button (click)="sortByNote()">
+            <mat-icon>sort</mat-icon>
+        </button>
+        <button mat-button (click)="sortByOrder()">
+            <mat-icon>sort_by_alpha</mat-icon>
+        </button>
+    </div>
+</div>
+
+<div class="bars">
+    <div class="snowAnimation">
+        <div class="posDepart">
+            <img [ngStyle]="{'animation-delay' : i + 's', 'top' : randomPosition[i] + '%'}" mat-card-avatar *ngFor="let cocktail of allCocktails;index as i;" [src]="cocktail">
+        </div>
+    </div>
+    <div class="line" *ngFor="let bar of bars;">
+        <mat-card [ngStyle]="{'opacity' : bar.isOpened ? '1' : '0.6'}" class="carte" [routerLink]="['/showed',bar.id]">
+            <mat-card-header style="display: flex; justify-content: center; height: 15%;">
+                <div style="width: 20%;">
+                    <img mat-card-avatar *ngIf="bar.cocktails[0].length > 0" [src]="bar.cocktails[0]"/>
+                    <img mat-card-avatar *ngIf="bar.cocktails[0].length === 0" src="../../assets/logo.PNG"/>    
+                </div>
+                <div style="width: 60%;">
+                    <mat-card-title>{{bar.name}}</mat-card-title>
+                </div>
+                <div style="width: 20%;">
+                    <circle-progress *ngIf="bar.note.length > 0" class="note" [percent]="bar.note * 10" [radius]="radius" [outerStrokeWidth]="strokeWidth" [innerStrokeWidth]="0"
+                        [outerStrokeColor]="'black'" [animation]="true" [animationDuration]="300" [titleFontSize]="titleFontSize" 
+                        [unitsFontSize]="subtitleFontSize" [title]="bar.note" [units]="'/10'" [subtitle]="''" [titleColor]="'black'"
+                        [unitsColor]="'black'"></circle-progress>
+                    <circle-progress *ngIf="bar.note.length === 0" class="note" [percent]="bar.priority * 20" [radius]="radius" [outerStrokeWidth]="strokeWidth" [innerStrokeWidth]="0"
+                        [outerStrokeColor]="'red'" [animation]="true" [animationDuration]="300" [titleFontSize]="titleFontSize" 
+                        [unitsFontSize]="subtitleFontSize" [title]="bar.priority" [units]="'/5'" [subtitle]="''" [titleColor]="'red'"
+                        [unitsColor]="'black'"></circle-progress>
+                </div>
+            </mat-card-header>
+            <div class="inside" [ngStyle]="{'background' : bar.img.length > 0 ? 'url('+ bar.img +')' : 'url('+ bar.typeFacade +')'}">
+                <div style="display: flex; justify-content: flex-end; width: 100%;">
+                    <mat-icon *ngIf="!bar.isOpened" style="color: #9a0000; font-size: 7vmin;">close</mat-icon>
+                    <mat-icon *ngIf="bar.isOpened" style="color: #38761D; font-size: 7vmin;">check</mat-icon>
+                </div>
+                <div class="lignes">
+                    <mat-nav-list style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+                        <mat-list-item *ngFor="let station of bar.stations">
+                            <span matLine>{{ station }}</span>
+                            <div style="display: grid; grid-template-columns: auto auto auto;">
+                                <ng-container *ngFor="let ligne of bar.lignes | keyvalue">
+                                    <img mat-card-avatar style="margin: 1vh;" *ngIf="ligne.value === station" [src]="'../../assets/' + ligne.key + '.png'">
+                                </ng-container>
+                            </div>
+                            
+                        </mat-list-item>
+                    </mat-nav-list>            
+                </div>
+            </div>
+        </mat-card>
+
+        <div class="details">
+            <p id="title">{{bar.ambiance}}</p>
+            <show-horaires [color]="'white'" [horaires]="bar.horaires"></show-horaires>
+            <p id="title">{{bar.address}}</p>
+        </div>
+    </div>
+</div>

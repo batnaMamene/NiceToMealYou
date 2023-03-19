@@ -1,0 +1,230 @@
+<body>
+    <div class="top">
+        <h2 class="title" *ngIf="place.theFork != null && place.theFork.length > 0" matTooltip="Bon plan TheFork" matTooltipPosition="after">
+            <a style="text-decoration: none; color: black" [href]="place.theFork">{{place.name}}</a>
+        </h2>
+        <h2 class="title" *ngIf="place.theFork == null || place.theFork.length === 0">{{place.name}}</h2>
+        <div class="img" *ngIf="place != null">
+            <img *ngIf="place.img.length > 0" [src]="place.img">
+            <img *ngIf="place.img.length === 0" [src]="'../../assets/' + place.typeFacade">
+            <h4 class="desc" *ngIf="place.comment">{{place.comment}}</h4>
+        </div>
+    </div>
+    
+    <!-- <div class="lineShowed" *ngIf="isOpened">
+                <mat-icon style="color: #38761D;">check_circle_outline</mat-icon>
+                <p id="infosP" style="color: #38761D; height: 24px;">Ouvert</p>
+            </div>
+            <div id="lineShowed" *ngIf="!isOpened">
+                <mat-icon style="color: #9a0000;">remove_circle_outline</mat-icon>
+                <p id="infosP" style="color: #9a0000;">Fermé</p>
+            </div> -->
+    
+    
+    <div class="inf" *ngIf="place != null">
+        <div id="station" [ngStyle]="{'left': randomPosition[i].left + '%', 'top': randomPosition[i].top + '%', 'animation-delay': i*0.6 + 's'}" *ngFor="let ligne of place.lignes | keyvalue; index as i;">
+            <img mat-card-avatar [src]="'../../assets/' + ligne.key + '.png'">
+            <p>{{cast(ligne.value)}}</p>
+        </div>
+                        
+        <circle-note *ngIf="place.note !== 0" [note]="place.note" [colorNote]="colorNote" [unit]="'10'" [mainColor]="'white'" [strokeWidth]="2"></circle-note>
+        <circle-note *ngIf="place.priority !== 0" [note]="place.priority" [colorNote]="'white'" [unit]="'10'" [mainColor]="'white'" [strokeWidth]="2"></circle-note>
+    
+        <show-horaires [color]="'white'" [horaires]="place.horaires" class="list"></show-horaires>
+    
+            
+        <div class="lineShowed" (click)="openMaps()">
+            <p>{{place.address}}, Paris {{place.arrondissement}}</p>
+            <mat-icon>location_on</mat-icon>
+        </div>
+    </div>
+    
+    <div class="good">
+        <img src="../../assets/red_light.jpg">
+        <mat-nav-list *ngIf="place.positif[0].length > 0">
+            <ng-container *ngFor="let positif of place.positif">
+                <mat-list-item *ngIf="positif.length > 0">
+                    <span matLine>{{ positif }}</span>
+                    <mat-icon>check</mat-icon>
+                </mat-list-item>
+            </ng-container> 
+        </mat-nav-list>
+        <h4 id="desc"  *ngIf="place.positif[0].length === 0">Aucun point positif</h4>
+    </div>
+    
+    <div class="bad">
+        <mat-nav-list *ngIf="place.negatif[0].length > 0">
+            <ng-container *ngFor="let negatif of place.negatif">
+                <mat-list-item *ngIf="negatif.length > 0">
+                    <span matLine>{{ negatif }}</span>
+                    <mat-icon>close</mat-icon>
+                </mat-list-item>
+            </ng-container>
+        </mat-nav-list>
+        <h4 id="desc" *ngIf="place.negatif[0].length === 0">Aucun point négatif</h4>
+        <img src="../../assets/green_light.jpg">
+    </div>
+
+    <div [ngStyle]="{'background': 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('+urlArrondissement+')'}" class="similar" *ngIf="sameArrondissement.length > 0">
+
+        <h2 *ngIf="place.arrondissement !== '1'" [ngStyle]="{'color': colorArrondissementTitle}" class="subtitle">Dans le {{place.arrondissement}}ème</h2>
+        <h2 *ngIf="place.arrondissement === '1'" [ngStyle]="{'color': colorArrondissementTitle}" class="subtitle">Dans le {{place.arrondissement}}er</h2>
+    
+    </div>
+
+    <div class="placesRoll">
+        <div *ngIf="sameArrondissement.length > 1" class="scrollButton">
+            <button (click)="scrollLeft('arrondissement')" mat-button>
+                <mat-icon>keyboard_arrow_left</mat-icon>
+            </button>
+        </div>
+        
+        <div class="results" id="arrondissement" *ngIf="sameArrondissement.length > 0">
+            <mat-card  class="card" *ngFor="let result of sameArrondissement; index as i;" (click)="reload(result)">
+                <mat-card-header style="height: 15%; width: 100%;">
+                    <img mat-card-avatar *ngIf="result.plat.length > 0" [src]="result.plat"/>
+                    <img mat-card-avatar *ngIf="result.plat.length === 0" [src]="'../../assets/'+'../../assets/' + result.typeIcon"/>
+                    <mat-card-title>{{result.name}}</mat-card-title>
+                    <circle-note *ngIf="place.note !== 0" [note]="place.note" [colorNote]="colorNote" [unit]="'10'" [mainColor]="'black'" [strokeWidth]="1"></circle-note>
+                    <circle-note *ngIf="place.priority !== 0" [note]="place.priority" [colorNote]="'black'" [unit]="'5'" [mainColor]="'black'" [strokeWidth]="1"></circle-note>
+                </mat-card-header>
+                <div class="info" id="{{i}}" [ngStyle]="{'background' : result.img.length > 0 ? 'linear-gradient(rgba(0,0,0,0.7),rgba(0,0,0,0.7)), url('+ result.img +')' : 'linear-gradient(rgba(0,0,0,0.7),rgba(0,0,0,0.7)), url('+ result.typeFacade +')'}">
+                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;height: 100%;">
+                        <div style="display: flex; justify-content: space-around; align-items: center; width: 100%; height: 100%;">
+                            <div class="lignes">
+                                <mat-nav-list>
+                                    <mat-list-item *ngFor="let station of result.stations">
+                                        <span matLine>{{ station }}</span>
+                                        <div style="display: grid; grid-template-columns: auto auto;">
+                                            <ng-container *ngFor="let ligne of result.lignes | keyvalue">
+                                                <img mat-card-avatar style="margin: 1vh;" *ngIf="ligne.value === station" [src]="'../../assets/' + ligne.key + '.png'">
+                                            </ng-container>
+                                        </div>
+                                        
+                                    </mat-list-item>
+                                </mat-nav-list>                    
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </mat-card>
+        </div>
+        
+        <div *ngIf="sameArrondissement.length > 1" class="scrollButton">
+            <button (click)="scrollRight('arrondissement')" mat-button>
+                <mat-icon>keyboard_arrow_right</mat-icon>
+            </button>
+        </div>
+    </div>
+    
+    
+    <div class="split" id="metro">
+        <div [ngStyle]="{'background': 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url(/assets/restaurant.jpg)'}" class="similar">
+            <h2 class="subtitle">Sur la même ligne</h2>    
+        </div>
+
+        <div class="placesRoll">
+            <h2 *ngIf="sameMetro.length === 0" style="color: black;" class="subtitle">Aucun autre restaurant sur ces lignes</h2>
+
+            <div *ngIf="sameMetro.length > 1" class="scrollButton">
+                <button (click)="scrollLeft('metro')" mat-button>
+                    <mat-icon>keyboard_arrow_left</mat-icon>
+                </button>
+            </div>
+            
+            <div class="results" id="metro" *ngIf="sameMetro.length > 0">
+                <mat-card  class="card" *ngFor="let result of sameMetro; index as i;" (click)="reload(result)">
+                    <mat-card-header style="height: 15%; width: 100%;">
+                        <img mat-card-avatar *ngIf="result.plat.length > 0" [src]="result.plat"/>
+                        <img mat-card-avatar *ngIf="result.plat.length === 0" [src]="'../../assets/'+'../../assets/' + result.typeIcon"/>
+                        <mat-card-title>{{result.name}}</mat-card-title>
+                        <circle-note *ngIf="place.note !== 0" [note]="place.note" [colorNote]="colorNote" [unit]="'10'" [mainColor]="'black'" [strokeWidth]="1"></circle-note>
+                        <circle-note *ngIf="place.priority !== 0" [note]="place.priority" [colorNote]="'black'" [unit]="'5'" [mainColor]="'black'" [strokeWidth]="1"></circle-note>
+                    </mat-card-header>
+                    <div class="info" id="{{i}}" [ngStyle]="{'background' : result.img.length > 0 ? 'linear-gradient(rgba(0,0,0,0.7),rgba(0,0,0,0.7)), url('+ result.img +')' : 'linear-gradient(rgba(0,0,0,0.7),rgba(0,0,0,0.7)), url('+ result.typeFacade +')'}">
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;height: 100%;">
+                            <div style="display: flex; justify-content: space-around; align-items: center; width: 100%; height: 100%;">
+                                <div class="lignes">
+                                    <mat-nav-list>
+                                        <mat-list-item *ngFor="let station of result.stations">
+                                            <span matLine>{{ station }}</span>
+                                            <div style="display: grid; grid-template-columns: auto auto;">
+                                                <ng-container *ngFor="let ligne of result.lignes | keyvalue">
+                                                    <img mat-card-avatar style="margin: 1vh;" *ngIf="ligne.value === station" [src]="'../../assets/' + ligne.key + '.png'">
+                                                </ng-container>
+                                            </div>
+                                            
+                                        </mat-list-item>
+                                    </mat-nav-list>                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </mat-card>
+            </div>
+            
+            <div *ngIf="sameMetro.length > 1" class="scrollButton">
+                <button (click)="scrollRight('metro')" mat-button>
+                    <mat-icon>keyboard_arrow_right</mat-icon>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    
+    
+    <div class="split" id="similar">
+        <div class="placesRoll">
+            <h2 *ngIf="similarPlaces.length === 0" style="color: black;" class="subtitle">Aucun autre restaurant du même type</h2>
+
+            <div *ngIf="similarPlaces.length > 1" class="scrollButton">
+                <button (click)="scrollLeft('results')" mat-button>
+                    <mat-icon>keyboard_arrow_left</mat-icon>
+                </button>
+            </div>
+            
+            <div class="results" id="results" *ngIf="similarPlaces.length > 0">
+                <mat-card  class="card" *ngFor="let result of similarPlaces; index as i;" (click)="reload(result)">
+                    <mat-card-header style="height: 15%; width: 100%;">
+                        <img mat-card-avatar *ngIf="result.plat.length > 0" [src]="result.plat"/>
+                        <img mat-card-avatar *ngIf="result.plat.length === 0" [src]="'../../assets/'+'../../assets/' + result.typeIcon"/>
+                        <mat-card-title>{{result.name}}</mat-card-title>
+                        <circle-note *ngIf="place.note !== 0" [note]="place.note" [colorNote]="colorNote" [unit]="'10'" [mainColor]="'black'" [strokeWidth]="1"></circle-note>
+                        <circle-note *ngIf="place.priority !== 0" [note]="place.priority" [colorNote]="'black'" [unit]="'5'" [mainColor]="'black'" [strokeWidth]="1"></circle-note>
+                    </mat-card-header>
+                    <div class="info" id="{{i}}" [ngStyle]="{'background' : result.img.length > 0 ? 'linear-gradient(rgba(0,0,0,0.7),rgba(0,0,0,0.7)), url('+ result.img +')' : 'linear-gradient(rgba(0,0,0,0.7),rgba(0,0,0,0.7)), url('+ result.typeFacade +')'}">
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;height: 100%;">
+                            <div style="display: flex; justify-content: space-around; align-items: center; width: 100%; height: 100%;">
+                                <div class="lignes">
+                                    <mat-nav-list>
+                                        <mat-list-item *ngFor="let station of result.stations">
+                                            <span matLine>{{ station }}</span>
+                                            <div style="display: grid; grid-template-columns: auto auto;">
+                                                <ng-container *ngFor="let ligne of result.lignes | keyvalue">
+                                                    <img mat-card-avatar style="margin: 1vh;" *ngIf="ligne.value === station" [src]="'../../assets/' + ligne.key + '.png'">
+                                                </ng-container>
+                                            </div>
+                                            
+                                        </mat-list-item>
+                                    </mat-nav-list>                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </mat-card>
+            </div>
+            
+            <div *ngIf="similarPlaces.length > 1" class="scrollButton">
+                <button (click)="scrollRight('results')" mat-button>
+                    <mat-icon>keyboard_arrow_right</mat-icon>
+                </button>
+            </div>
+        </div>
+
+        <div class="similar" style="background: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.9)), url('/assets/restaurant.jpg'); background-size: cover;" *ngIf="similarPlaces.length > 0">
+            <h2 class="subtitle" style="color: black;">Même type</h2>
+        </div>
+    </div>
+    
+</body>

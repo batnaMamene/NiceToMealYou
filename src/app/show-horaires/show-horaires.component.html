@@ -1,0 +1,12 @@
+<div class="border" [ngStyle]="{'color': color}">
+    <div class="horaires">
+        <div class="line" *ngFor="let horaire of horairesTab">
+            <p>{{horaire.day}}</p>
+            <div id="hour">
+                <p *ngIf="horaire.horaires[0].length > 0 && horaire.horaires.length === 2">{{horaire.horaires[0]}}-{{horaire.horaires[1]}}</p>
+                <p *ngIf="horaire.horaires[0].length === 0">-</p>
+                <p *ngIf="horaire.horaires[0].length > 0 && horaire.horaires.length === 4">{{horaire.horaires[0]}}-{{horaire.horaires[1]}}/{{horaire.horaires[2]}}-{{horaire.horaires[3]}}</p>    
+            </div>
+        </div>
+    </div>
+</div>

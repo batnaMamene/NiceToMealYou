@@ -1,0 +1,118 @@
+<div class="ads">
+    <h2 class="title">Restaurants sur Paris</h2>
+    <p>Trouvez votre prochain restaurant parisien.</p>
+</div>
+
+<div class="sort">
+    <div id="sorter">
+        <mat-select [(ngModel)]="typesSelect" (selectionChange)="sort()" placeholder="Type" #allType multiple class="select" required>
+            <mat-select-trigger>
+                Type
+            </mat-select-trigger>
+            <mat-option *ngFor="let option of types" [value]="option">
+                {{option}}
+            </mat-option>
+            <mat-option (click)="toggleAllType()" [value]="0">All</mat-option>
+        </mat-select>
+    </div>
+
+    <div id="sorter">
+        <mat-select (selectionChange)="sort()" placeholder="Ligne" #allLigne multiple class="select" required>
+            <mat-select-trigger>
+                Ligne
+            </mat-select-trigger>
+            <mat-option *ngFor="let option of lignes" [value]="option">
+                {{option}}
+            </mat-option>
+            <mat-option (click)="toggleAllLigne()" [value]="0">All</mat-option>
+        </mat-select>
+    </div>
+
+    <div id="sorter">
+        <mat-select (selectionChange)="sort()" placeholder="Arrondissement" #allArrondissement multiple class="select" required>
+            <mat-select-trigger>
+                Arrondissement
+            </mat-select-trigger>
+            <mat-option *ngFor="let option of arrondissements" [value]="option">
+                {{option}}
+            </mat-option>
+            <mat-option (click)="toggleAllArrondissement()" [value]="0">All</mat-option>
+        </mat-select>
+    </div>
+
+    <div id="sorter">
+        <mat-select (selectionChange)="sort()" #opened placeholder="Ouvert" multiple class="select" required>
+            <mat-option *ngFor="let option of openedOptions" [value]="option">
+                {{option}}
+            </mat-option>
+        </mat-select>
+    </div>
+
+    <div id="filter">
+        <button mat-button (click)="sortByNote()">
+            <mat-icon>sort</mat-icon>
+        </button>
+        <button mat-button (click)="sortByOrder()">
+            <mat-icon>sort_by_alpha</mat-icon>
+        </button>
+    </div>
+</div>
+
+<div class="restaurants">
+    <div class="snowAnimation">
+        <div class="posDepart">
+            <img [ngStyle]="{'animation-delay' : i + 's', 'top' : randomPosition[i] + '%'}" mat-card-avatar *ngFor="let plat of allPlates;index as i;" [src]="plat">
+        </div>
+    </div>
+    <div class="line" *ngFor="let restaurant of restaurants;">
+        <mat-card [ngStyle]="{'opacity' : restaurant.isOpened ? '1' : '0.6'}" class="carte" [routerLink]="['/showed',restaurant.id]">
+            <mat-card-header style="display: flex; justify-content: center; height: 15%;">
+                <div style="width: 20%;">
+                    <img mat-card-avatar *ngIf="restaurant.plat.length > 0" [src]="restaurant.plat"/>
+                    <img mat-card-avatar *ngIf="restaurant.plat.length === 0" [src]="'../../assets/' + restaurant.typeIcon"/>    
+                </div>
+                <div style="width: 60%;">
+                    <mat-card-title>{{restaurant.name}}</mat-card-title>
+                </div>
+                <div style="width: 20%;">
+                    <circle-progress *ngIf="restaurant.note.length > 0" class="note" [percent]="restaurant.note * 10" [radius]="radius" [outerStrokeWidth]="strokeWidth" [innerStrokeWidth]="0"
+                        [outerStrokeColor]="'black'" [animation]="true" [animationDuration]="300" [titleFontSize]="titleFontSize" 
+                        [unitsFontSize]="subtitleFontSize" [title]="restaurant.note" [units]="'/10'" [subtitle]="''" [titleColor]="'black'"
+                        [unitsColor]="'black'"></circle-progress>
+                    <circle-progress *ngIf="restaurant.note.length === 0" class="note" [percent]="restaurant.priority * 20" [radius]="radius" [outerStrokeWidth]="strokeWidth" [innerStrokeWidth]="0"
+                        [outerStrokeColor]="'red'" [animation]="true" [animationDuration]="300" [titleFontSize]="titleFontSize" 
+                        [unitsFontSize]="subtitleFontSize" [title]="restaurant.priority" [units]="'/5'" [subtitle]="''" [titleColor]="'red'"
+                        [unitsColor]="'black'"></circle-progress>
+                </div>
+            </mat-card-header>
+            <div class="inside" [ngStyle]="{'background' : restaurant.img.length > 0 ? 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('+ restaurant.img +')' : 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('+ restaurant.typeFacade +')'}">
+                <div style="display: flex; justify-content: flex-end; align-items: center; width: 100%; height: 10%;">
+                    <mat-icon *ngIf="!restaurant.isOpened" style="color: #9a0000; font-size: 7vmin;">close</mat-icon>
+                    <mat-icon *ngIf="restaurant.isOpened" style="color: #38761D; font-size: 7vmin;">check</mat-icon>
+                </div>
+                <div class="lignes">
+                    <mat-nav-list style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+                        <mat-list-item *ngFor="let station of restaurant.stations">
+                            <span matLine>{{ station }}</span>
+                            <div style="display: grid; grid-template-columns: auto auto auto;">
+                                <ng-container *ngFor="let ligne of restaurant.lignes | keyvalue">
+                                    <img mat-card-avatar style="margin: 1vh;" *ngIf="ligne.value === station" [src]="'../../assets/' + ligne.key + '.png'">
+                                </ng-container>
+                            </div>
+                            
+                        </mat-list-item>
+                    </mat-nav-list>
+                </div>
+            </div>
+        </mat-card>
+
+        <div class="details">
+            <p id="title">{{restaurant.type}}</p>
+            <show-horaires [color]="'white'" [horaires]="restaurant.horaires"></show-horaires>
+            <p id="title">{{restaurant.address}}</p>
+        </div>
+    </div>
+    
+
+
+</div>
